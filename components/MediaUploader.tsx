@@ -1,15 +1,18 @@
 import React, { useRef } from 'react';
 import { MediaItem } from '../types';
 import { X, Upload, Image as ImageIcon, Film } from 'lucide-react';
+import { TRANSLATIONS, Language } from '../constants';
 
 interface MediaUploaderProps {
   media: MediaItem[];
   onMediaChange: (newMedia: MediaItem[]) => void;
   onAnalyzeReq?: (file: File) => void;
+  lang?: Language;
 }
 
-export const MediaUploader: React.FC<MediaUploaderProps> = ({ media, onMediaChange, onAnalyzeReq }) => {
+export const MediaUploader: React.FC<MediaUploaderProps> = ({ media, onMediaChange, onAnalyzeReq, lang = 'en' }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const t = TRANSLATIONS[lang];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -46,7 +49,7 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({ media, onMediaChan
     <div className="space-y-4">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {media.map((item) => (
-          <div key={item.id} className="relative group aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+          <div key={item.id} className="relative group aspect-square bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600">
             {item.type === 'image' ? (
               <img src={item.url} alt="Preview" className="w-full h-full object-cover" />
             ) : (
@@ -68,10 +71,10 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({ media, onMediaChan
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-500 hover:text-indigo-600"
+          className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400"
         >
           <Upload size={24} className="mb-2" />
-          <span className="text-xs font-medium">Add Media</span>
+          <span className="text-xs font-medium">{t.addMedia}</span>
         </button>
       </div>
       

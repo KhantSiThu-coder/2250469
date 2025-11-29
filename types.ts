@@ -17,6 +17,7 @@ export interface ShoppingItem {
   notes: string;
   media: MediaItem[];
   createdAt: number;
+  deletedAt?: number;
 }
 
 export interface GeminiAnalysisResult {

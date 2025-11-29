@@ -26,7 +26,7 @@ const fileToGenerativePart = async (file: File): Promise<{ inlineData: { data: s
   });
 };
 
-export const analyzeItemImage = async (imageFile: File): Promise<GeminiAnalysisResult> => {
+export const analyzeItemImage = async (imageFile: File, currency: string = 'JPY'): Promise<GeminiAnalysisResult> => {
   if (!apiKey) {
     console.warn("API Key is missing. Skipping AI analysis.");
     throw new Error("API Key is missing.");
@@ -44,7 +44,7 @@ export const analyzeItemImage = async (imageFile: File): Promise<GeminiAnalysisR
             text: `Analyze this image of a shopping item. 
             Identify the product name.
             Classify it strictly into one of these groups: 'Cooking Ingredients', 'Food & Drinks', 'Clothing', 'Electronics', 'Others'.
-            Estimate price in Japanese Yen (numeric only). If price is not visible or unknown, return null.
+            Estimate price in ${currency} (numeric only). If price is not visible or unknown, return null.
             Provide a short visual description for notes.`
           }
         ]
