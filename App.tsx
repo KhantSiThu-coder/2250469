@@ -8,7 +8,7 @@ import {
   Plus, Search, ShoppingBag, Utensils, Coffee, Shirt, Monitor, 
   MoreHorizontal, ListFilter, SlidersHorizontal, Grid3X3, Grid2X2, RectangleHorizontal, 
   CheckCircle2, AlertCircle, PackageCheck, Settings, X, Moon, Sun, MonitorSmartphone, Languages,
-  Coins, Trash2, Undo2, Database, HardDrive
+  Coins, Trash2, Undo2, Database, HardDrive, Download
 } from 'lucide-react';
 import { TRANSLATIONS, Language, CATEGORY_KEYS, Currency, CURRENCY_OPTIONS } from './constants';
 
@@ -71,6 +71,7 @@ const App: React.FC = () => {
 
   // Toast State
   const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string>('');
   const [lastDeletedId, setLastDeletedId] = useState<string | null>(null);
 
   const t = TRANSLATIONS[language];
@@ -86,6 +87,48 @@ const App: React.FC = () => {
       root.classList.remove('dark');
     }
   }, [theme]);
+
+  // Handle Shared URL Import
+  useEffect(() => {
+    const checkForShare = () => {
+      const params = new URLSearchParams(window.location.search);
+      const shareCode = params.get('share');
+      if (shareCode) {
+        try {
+          const json = decodeURIComponent(atob(shareCode));
+          const data = JSON.parse(json);
+          
+          // Reconstruct item from short keys
+          const sharedItem: ShoppingItem = {
+             id: '', // Empty ID triggers "New Item" / "Import" flow in logic, effectively cloning it
+             createdAt: Date.now(),
+             media: [],
+             name: data.n || '',
+             category: data.c || CATEGORY_KEYS[0],
+             price: data.p || null,
+             store: data.s || null,
+             status: data.st || 'to-buy',
+             notes: data.nt || '',
+          };
+
+          setEditingItem(sharedItem);
+          setIsFormOpen(true);
+          setToastMessage(t.itemImported);
+          setShowToast(true);
+          setTimeout(() => setShowToast(false), 3000);
+          
+          // Clear URL so refresh doesn't re-import
+          window.history.replaceState({}, '', window.location.pathname);
+        } catch (e) {
+          console.error("Failed to parse share data", e);
+        }
+      }
+    };
+    
+    // Slight delay to ensure translations are loaded if necessary, though here t is synchronous
+    // Just run it
+    checkForShare();
+  }, [t.itemImported]);
 
   // Load items from IndexedDB and Request Persistence
   useEffect(() => {
@@ -149,7 +192,18 @@ const App: React.FC = () => {
   const handleUpdateItem = async (itemData: Omit<ShoppingItem, 'id' | 'createdAt'>) => {
     if (!editingItem) return;
     
-    // Optimistic Update
+    // If editingItem has an empty ID, it's a shared item being saved as new.
+    // handleAddItem handles ID generation, but we call handleUpdateItem if editingItem is not null.
+    // We need to check if it's a "real" update or a "save imported item"
+    
+    if (editingItem.id === '') {
+       // It was an imported item, treat as new add
+       await handleAddItem(itemData);
+       setEditingItem(null);
+       return;
+    }
+
+    // Normal Update
     const updatedItem = { ...editingItem, ...itemData };
     
     setItems((prev) => 
@@ -187,6 +241,7 @@ const App: React.FC = () => {
     setLastDeletedId(id);
     
     // Show feedback toast
+    setToastMessage(t.itemMovedToTrash);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 4000);
 
@@ -572,18 +627,29 @@ const App: React.FC = () => {
           </button>
         )}
 
-        {/* Undo Notification Toast */}
+        {/* Notification Toast */}
         {showToast && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900/90 dark:bg-white/90 text-white dark:text-gray-900 px-5 py-3 rounded-xl shadow-xl z-[100] flex items-center gap-4 animate-in fade-in slide-in-from-bottom-2 backdrop-blur-sm">
-            <span className="font-medium">{t.itemMovedToTrash}</span>
-            <div className="h-4 w-px bg-white/20 dark:bg-black/20"></div>
-            <button 
-              onClick={handleUndoDelete} 
-              className="flex items-center gap-1.5 text-indigo-400 dark:text-indigo-600 font-bold hover:underline"
-            >
-              <Undo2 size={16} />
-              {t.undo}
-            </button>
+             {toastMessage === t.itemImported ? (
+                <Download size={16} />
+             ) : (
+                <span className="font-medium">{toastMessage}</span>
+             )}
+             
+             {toastMessage === t.itemMovedToTrash ? (
+               <>
+                 <div className="h-4 w-px bg-white/20 dark:bg-black/20"></div>
+                 <button 
+                  onClick={handleUndoDelete} 
+                  className="flex items-center gap-1.5 text-indigo-400 dark:text-indigo-600 font-bold hover:underline"
+                >
+                  <Undo2 size={16} />
+                  {t.undo}
+                </button>
+               </>
+             ) : (
+                <span className="font-medium">{toastMessage === t.itemImported ? toastMessage : ''}</span>
+             )}
           </div>
         )}
       </div>

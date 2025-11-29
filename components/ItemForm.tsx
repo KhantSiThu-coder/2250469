@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ShoppingItem, MediaItem, ItemStatus } from '../types';
 import { MediaUploader } from './MediaUploader';
 import { analyzeItemImage } from '../services/geminiService';
-import { Loader2, Sparkles, Save, X, Trash2 } from 'lucide-react';
+import { Loader2, Sparkles, Save, X, Trash2, Share2, Check } from 'lucide-react';
 import { TRANSLATIONS, Language, CATEGORY_KEYS, Currency } from '../constants';
 
 interface ItemFormProps {
@@ -36,12 +36,20 @@ export const ItemForm: React.FC<ItemFormProps> = ({
   const [media, setMedia] = useState<MediaItem[]>(initialData?.media || []);
   
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [shareFeedback, setShareFeedback] = useState<string | null>(null);
 
   useEffect(() => {
      if (initialData?.category && !CATEGORY_KEYS.includes(initialData.category)) {
        setCategory('Others');
      }
   }, [initialData]);
+
+  useEffect(() => {
+    if (shareFeedback) {
+      const timer = setTimeout(() => setShareFeedback(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [shareFeedback]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,21 +91,54 @@ export const ItemForm: React.FC<ItemFormProps> = ({
     }
   };
 
+  const handleShare = async () => {
+    // Construct payload with short keys to save URL space
+    // n=name, c=category, p=price, s=store, st=status, nt=notes
+    const payload = {
+      n: name,
+      c: category,
+      p: isPriceUnknown ? null : price,
+      s: store,
+      st: status,
+      nt: notes
+    };
+
+    try {
+      const json = JSON.stringify(payload);
+      // encodeURIComponent handles Unicode characters correctly before btoa
+      const encoded = btoa(encodeURIComponent(json));
+      const url = `${window.location.origin}${window.location.pathname}?share=${encoded}`;
+
+      await navigator.clipboard.writeText(url);
+      setShareFeedback(t.shareWarning); // Show warning about media not being shared
+    } catch (err) {
+      console.error("Share failed", err);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col h-full bg-white dark:bg-gray-800 transition-colors">
+    <form onSubmit={handleSubmit} className="flex flex-col h-full bg-white dark:bg-gray-800 transition-colors relative">
       <div className="flex items-center justify-between p-4 border-b dark:border-gray-700">
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
           {initialData ? t.edit : t.create}
         </h2>
         <div className="flex items-center gap-2">
+          
+          <button
+            type="button"
+            onClick={handleShare}
+            className="text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/30 p-2 rounded-full transition-colors cursor-pointer relative"
+            title={t.share}
+          >
+            {shareFeedback === t.shareSuccess ? <Check size={20} /> : <Share2 size={20} />}
+          </button>
+
           {initialData?.id && onDelete && (
             <button 
               type="button" 
               onClick={() => {
-                // Ensure ID exists before deletion attempt
                 if (initialData.id) {
                    onDelete(initialData.id);
-                   // Do not call onCancel() here; parent handles closing on successful delete
                 }
               }} 
               className="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 p-2 rounded-full transition-colors cursor-pointer"
@@ -111,6 +152,16 @@ export const ItemForm: React.FC<ItemFormProps> = ({
           </button>
         </div>
       </div>
+      
+      {/* Share Feedback Toast inside form */}
+      {shareFeedback && (
+        <div className="absolute top-[70px] left-0 right-0 mx-4 z-10">
+          <div className="bg-indigo-600 text-white text-xs px-3 py-2 rounded-lg shadow-lg flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+            <Check size={14} className="flex-shrink-0" />
+            <p className="flex-1">{t.shareSuccess} <span className="opacity-80 block text-[10px] mt-0.5 font-normal">{t.shareWarning}</span></p>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {/* Media Section */}
