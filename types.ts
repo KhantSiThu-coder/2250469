@@ -12,7 +12,7 @@ export interface ShoppingItem {
   name: string;
   category: string;
   price: number | null;
-  store: string;
+  store: string | null;
   status: ItemStatus;
   notes: string;
   media: MediaItem[];

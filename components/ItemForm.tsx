@@ -18,6 +18,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({ initialData, onSubmit, onCan
   const [price, setPrice] = useState(initialData?.price?.toString() || '');
   const [isPriceUnknown, setIsPriceUnknown] = useState(initialData?.price === null);
   const [store, setStore] = useState(initialData?.store || '');
+  const [isStoreUnknown, setIsStoreUnknown] = useState(initialData?.store === null);
   const [status, setStatus] = useState<ItemStatus>(initialData?.status || 'to-buy');
   const [notes, setNotes] = useState(initialData?.notes || '');
   const [media, setMedia] = useState<MediaItem[]>(initialData?.media || []);
@@ -36,7 +37,7 @@ export const ItemForm: React.FC<ItemFormProps> = ({ initialData, onSubmit, onCan
       name,
       category,
       price: isPriceUnknown ? null : (parseFloat(price) || 0),
-      store,
+      store: isStoreUnknown ? null : store,
       status,
       notes,
       media,
@@ -161,13 +162,31 @@ export const ItemForm: React.FC<ItemFormProps> = ({ initialData, onSubmit, onCan
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Store / Location</label>
-            <input
-              type="text"
-              value={store}
-              onChange={(e) => setStore(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-              placeholder="e.g., Supermarket, Online"
-            />
+            <div className="flex items-start gap-4">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={store}
+                  onChange={(e) => setStore(e.target.value)}
+                  disabled={isStoreUnknown}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none disabled:bg-gray-100 disabled:text-gray-400"
+                  placeholder={isStoreUnknown ? "-" : "e.g., Supermarket, Online"}
+                />
+              </div>
+              <div className="flex items-center h-[42px]">
+                <input
+                  type="checkbox"
+                  id="unknownStore"
+                  checked={isStoreUnknown}
+                  onChange={(e) => {
+                    setIsStoreUnknown(e.target.checked);
+                    if (e.target.checked) setStore('');
+                  }}
+                  className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                />
+                <label htmlFor="unknownStore" className="ml-2 text-sm text-gray-700 select-none">Don't know</label>
+              </div>
+            </div>
           </div>
 
           <div>
