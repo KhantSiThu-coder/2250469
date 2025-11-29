@@ -69,6 +69,9 @@ export const TRANSLATIONS = {
     storage: 'Storage',
     used: 'Used',
     available: 'Available',
+    footerCreatedBy: 'Created by',
+    footerEmailPrompt: 'Feel free to email me if you have any ideas for this web app.',
+    footerClickHere: 'Click here.',
     categories: {
       'Cooking Ingredients': 'Cooking Ingredients',
       'Food & Drinks': 'Food & Drinks',
@@ -130,6 +133,9 @@ export const TRANSLATIONS = {
     storage: 'ストレージ',
     used: '使用中',
     available: '利用可能',
+    footerCreatedBy: '作成者:',
+    footerEmailPrompt: 'ご意見やアイデアがございましたら、お気軽にメールください。',
+    footerClickHere: 'ここをクリック',
     categories: {
       'Cooking Ingredients': '食材',
       'Food & Drinks': '食品・飲料',
@@ -191,6 +197,9 @@ export const TRANSLATIONS = {
     storage: '存储空间',
     used: '已用',
     available: '可用',
+    footerCreatedBy: '创建者:',
+    footerEmailPrompt: '如果您有任何想法，请随时发邮件给我。',
+    footerClickHere: '点击这里',
     categories: {
       'Cooking Ingredients': '烹饪原料',
       'Food & Drinks': '食品饮料',
@@ -252,6 +261,9 @@ export const TRANSLATIONS = {
     storage: 'သိုလှောင်ခန်း',
     used: 'သုံးပြီး',
     available: 'ကျန်ရှိ',
+    footerCreatedBy: 'ဖန်တီးသူ -',
+    footerEmailPrompt: 'ဤ Web App အတွက် အကြံဉာဏ်များရှိပါက ကျွန်ုပ်ထံ အီးမေးလ်ပေးပို့နိုင်ပါသည်။',
+    footerClickHere: 'ဒီမှာနှိပ်ပါ',
     categories: {
       'Cooking Ingredients': 'ချက်ပြုတ်ပစ္စည်းများ',
       'Food & Drinks': 'အစားအသောက်',
@@ -314,6 +326,9 @@ export const TRANSLATIONS = {
     storage: '저장 공간',
     used: '사용됨',
     available: '사용 가능',
+    footerCreatedBy: '제작:',
+    footerEmailPrompt: '이 앱에 대한 아이디어가 있으시면 언제든지 이메일을 보내주세요.',
+    footerClickHere: '여기를 클릭하세요',
     categories: {
       'Cooking Ingredients': '요리 재료',
       'Food & Drinks': '식음료',

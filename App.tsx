@@ -495,9 +495,9 @@ const App: React.FC = () => {
         </header>
 
         {/* Scrollable List */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50/50 dark:bg-gray-900/50">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-gray-50/50 dark:bg-gray-900/50 flex flex-col">
           {filteredItems.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-center">
+            <div className="flex-1 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500 text-center min-h-[300px]">
               <ShoppingBag size={48} className="mb-4 opacity-50" />
               <p className="text-lg font-medium">{t.noItems}</p>
               <p className="text-sm">{t.emptyState}</p>
@@ -511,7 +511,7 @@ const App: React.FC = () => {
               )}
             </div>
           ) : (
-            <div className="space-y-8">
+            <div className="space-y-8 flex-1">
               {categoriesToShow.map((cat) => {
                 const categoryItems = filteredItems.filter(i => i.category === cat);
                 if (categoryItems.length === 0) return null;
@@ -545,6 +545,20 @@ const App: React.FC = () => {
               })}
             </div>
           )}
+
+          {/* Footer */}
+          <footer className="mt-12 py-8 text-center text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-800">
+            <p>{t.footerCreatedBy} <span className="font-semibold text-gray-900 dark:text-gray-200">Khant Si Thu</span>.</p>
+            <p className="mt-1">
+              {t.footerEmailPrompt}{" "}
+              <a 
+                href="mailto:khantsithu.1999.work@gmail.com" 
+                className="text-indigo-600 dark:text-indigo-400 font-medium hover:underline decoration-2 underline-offset-2"
+              >
+                {t.footerClickHere}
+              </a>
+            </p>
+          </footer>
         </main>
 
         {/* Floating Action Button */}
